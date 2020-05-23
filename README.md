@@ -1,5 +1,5 @@
 # lil_insta_scraper
-lil_insta_scraper is a little instagram scraper in python
+lil_insta_scraper is a little instagram scraper in python.
 # Installation
 ```bash
 git clone https://github.com/TheSaltMaker/lil_insta_scraper.git
@@ -14,3 +14,5 @@ You simply use arguments as `-s` for your sessionID (check it next) and `-t` for
 To have your sesssion ID you have to log in on instagram with your browser. You have to `Inspect element` and go in `storage`. Now you can see a category named `cookies` within instagram url. You go on it and you can see a table with the `sessionid`. 
 
 ![alt text](https://github.com/TheSaltMaker/lil_insta_scraper/blob/master/lil_insta_scraper_sessionid.png?raw=true)
+# Disclaimer
+I'm not responsible of what you do with this script. 

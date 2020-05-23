@@ -1,5 +1,5 @@
 # lil_insta_scraper
-lil_insta_scraper is a little instagram scraper in python.
+lil_insta_scraper is a little instagram scraper in python. It allows you to grab the mail and/or the phone number on some account who let you see those informations. 
 # Installation
 ```bash
 git clone https://github.com/TheSaltMaker/lil_insta_scraper.git

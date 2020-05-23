@@ -4,8 +4,8 @@ lil_insta_scraper is a little instagram scraper in python
 ```bash
 git clone https://github.com/TheSaltMaker/lil_insta_scraper.git
 cd lil_insta_scraper/
-python3 -m pip install -r requirements.txt ```
-
+python3 -m pip install -r requirements.txt
+```
 # Usage
 You simply use arguments as `-s` for your sessionID (check it next) and `-t` for your target username. 
 # exemple

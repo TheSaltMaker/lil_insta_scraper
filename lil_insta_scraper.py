@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser() #simpler
 requiered = parser.add_argument_group('requiered arguments')
 parser.add_argument('-s', '--sessionid', help="Your session ID, check the GitHub to know how to get it", required=True) #because we will use an account to simplify 
 parser.add_argument('-t', '--target', help="The target you want to spy")
-parser.add_argument('-f', '--file', help="A list of username to spy each one")
+#parser.add_argument('-f', '--file', help="A list of username to spy each one") coming soon
 args = parser.parse_args()
 sessionid = args.sessionid
 target = args.target

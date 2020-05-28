@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 import requests
 import json
 import argparse
+import webbrowser
 
 parser = argparse.ArgumentParser() #simpler
 requiered = parser.add_argument_group('requiered arguments')
 parser.add_argument('-s', '--sessionid', help="Your session ID, check the GitHub to know how to get it", required=True) #because we will use an account to simplify 
 parser.add_argument('-t', '--target', help="The target you want to spy")
-#parser.add_argument('-f', '--file', help="A list of username to spy each one") #will be added soon
+parser.add_argument('-f', '--file', help="A list of username to spy each one")
 args = parser.parse_args()
 sessionid = args.sessionid
 target = args.target
@@ -38,8 +40,9 @@ def FakePhoneSession(sessionid, userid, target):
     if targetinfo["has_anonymous_profile_picture"] == True: #insta tell us if the account got a pp or a default one 
         print("{} has no profile picture.".format(target))
     else:
-        print("There is {}'s profile picture:".format(target))
-        print(targetinfo["hd_profile_pic_url_info"]["url"]) #insta app can give us an hd version of the profile picture
+        a = input("Do you want to see {}'s profile picture ? [y/n]".format(target))
+        if a == "y" or a == "Y" or a == "Yes" or a == "yes":
+            webbrowser.open_new("{}".format(targetinfo["hd_profile_pic_url_info"]["url"]))#start a web browser to see the pic
         wtpp = input("Do you want to download the profile picture ? [y/n] ")
         if wtpp == "y" or wtpp == "Y" or wtpp == "Yes" or wtpp == "yes":
             downloading = requests.get(targetinfo["hd_profile_pic_url_info"]["url"]) #get the url where the pictire is
@@ -48,14 +51,19 @@ def FakePhoneSession(sessionid, userid, target):
             file.close #close the file 
     return(targetinfo) #we return the info to use it later
     
-
 def UserID(target):
     r = requests.get("https://www.instagram.com/{}/?__a=1".format(target)) #requests to a graphQL page to get the ID for FakePhoneSession function
     info = json.loads(r.text)
     id = info["logging_page_id"].strip("profilePage_") #extract the ID 
     print("{}'s ID is ".format(target)+ id) #printing it incase you want it
+    fullname = info["graphql"]["user"]["full_name"] #just reading the value 
+    following = info["graphql"]["user"]["edge_follow"]["count"]
+    followers = info["graphql"]["user"]["edge_followed_by"]["count"]
+    print("Full name: ", fullname)
+    print("Following: ", following)
+    print("Followers: ", followers)
+    print("Biography: {}".format(info["graphql"]["user"]["biography"]))
     return(id)
-
 
 userid = UserID(target) #give a value to userid for the next function
 FakePhoneSession(sessionid, userid, target) 

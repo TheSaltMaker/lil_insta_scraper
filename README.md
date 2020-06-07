@@ -29,7 +29,7 @@ When you download a profile picture, export infos or both, they will be saved in
 To have your sesssion ID you have to log in on instagram with your browser. You have to `Inspect element` and go in `storage`. Now you can see a category named `cookies` within instagram url. You go on it and you can see a table with the `sessionid`. 
 
 ![alt text](https://github.com/TheSaltMaker/lil_insta_scraper/blob/master/lil_insta_scraper_sessionid.png?raw=true)
-# Disclaimer
+# :exclamation: Disclaimer
 I'm not responsible of what you do with this script !
-# Contact me
+# :speech_balloon: Contact me
 If you want to talk with me, you may find me on discord `SCP-343#2349` (I have may changed my name) or on Twitter `@MathsBreaking`.

@@ -1,17 +1,17 @@
-# -*- coding: utf-8 -*-
 import requests
 import json
 import argparse
 import webbrowser
+import os
 
 parser = argparse.ArgumentParser() #simpler
 requiered = parser.add_argument_group('requiered arguments')
-parser.add_argument('-s', '--sessionid', help="Your session ID, check the GitHub to know how to get it", required=True) #because we will use an account to simplify 
+parser.add_argument('-s', '--sessionid', help="Your session ID, check the GitHub to know how to get it", required=True) 
 parser.add_argument('-t', '--target', help="The target you want to spy")
-#parser.add_argument('-f', '--file', help="A list of username to spy each one") coming soon
+parser.add_argument('-f', '--file', help="A list of username to spy each one")
 args = parser.parse_args()
 sessionid = args.sessionid
-target = args.target
+file = args.file
 
 def FakePhoneSession(sessionid, userid, target):
     cookies = {'sessionid': sessionid} # to be connected to our account 
@@ -19,38 +19,36 @@ def FakePhoneSession(sessionid, userid, target):
     r = requests.get("https://i.instagram.com/api/v1/users/"+userid+"/info/", headers=headers, cookies=cookies) #building a request as if we were the app
     info = json.loads(r.text)
     targetinfo = info["user"] #we extract the infos we want 
-    if "public_email" in targetinfo:
-        if targetinfo["public_email"] != "": #to check if there is a mail
-            print("{}'s mail is ".format(target) +targetinfo["public_email"]) #extract the mail from the json
-        else:
-            print("There is no email there.")
+    return targetinfo
+
+def mailextraction(targetinfo):
+    if "public_email" in targetinfo and targetinfo["public_email"] != "": #checking if it's empty
+        mail = targetinfo["public_email"]
     else:
-        print("There is no email there.")
-    if "public_phone_number" in targetinfo:
-        if targetinfo["public_phone_number"] != "": #to check if there is a phone number
-            print("{}'s phone number is +".format(target) +targetinfo["public_phone_country_code"]+targetinfo["public_phone_number"]) #extract the phone number from the json
-        else:
-            print("There is no phone number there.")
+        mail = "NULL"
+    return mail
+
+def phoneextraction(targetinfo):
+    if "public_phone_number" in targetinfo and targetinfo["public_phone_number"] != "":
+        phone = "+"+targetinfo["public_phone_country_code"]+targetinfo["public_phone_number"] #checkink & 
     else:
-        print("There is no phone number there.")
-    if targetinfo["is_private"] == False: #check if the account is public of private
-        print("{} account is public.".format(target))
+        phone = "NULL"
+    return phone
+
+def privateaccount(targetinfo):
+    if targetinfo["is_private"] == False: #checking if private
+        private = False
     else:
-        print("{} account is private.".format(target))
-    if targetinfo["has_anonymous_profile_picture"] == True: #insta tell us if the account got a pp or a default one 
-        print("{} has no profile picture.".format(target))
+        private = True
+    return private
+
+def profilpic(targetinfo):
+    if targetinfo["has_anonymous_profile_picture"] == True: #people without profile picture
+        profilepicture = "NULL"
     else:
-        a = input("Do you want to see {}'s profile picture ? [y/n]".format(target))
-        if a == "y" or a == "Y" or a == "Yes" or a == "yes":
-            webbrowser.open_new("{}".format(targetinfo["hd_profile_pic_url_info"]["url"]))#start a web browser to see the pic
-        wtpp = input("Do you want to download the profile picture ? [y/n] ")
-        if wtpp == "y" or wtpp == "Y" or wtpp == "Yes" or wtpp == "yes":
-            downloading = requests.get(targetinfo["hd_profile_pic_url_info"]["url"]) #get the url where the pictire is
-            file = open("{}_profile_picture.jpg".format(target), "wb") #open a file 
-            file.write(downloading.content) # write the profile picture in it 
-            file.close #close the file 
-    return(targetinfo) #we return the info to use it later
-    
+        profilepicture = targetinfo["hd_profile_pic_url_info"]["url"] #instagram give us the HD picture
+    return profilepicture
+
 def UserID(target):
     r = requests.get("https://www.instagram.com/{}/?__a=1".format(target)) #requests to a graphQL page to get the ID for FakePhoneSession function
     info = json.loads(r.text)
@@ -65,5 +63,68 @@ def UserID(target):
     print("Biography: {}".format(info["graphql"]["user"]["biography"]))
     return(id)
 
-userid = UserID(target) #give a value to userid for the next function
-FakePhoneSession(sessionid, userid, target) 
+def wirtingfile(target, userid, email, phone, private, profpc, name):
+    os.system("mkdir {}".format(target)) #create a dir to stock infos
+    f = open("{}/{}.txt".format(target, name), "w") #opening the dir & create the file we want
+    f.write('''{}'s ID is {}:
+    email: {}
+    phone: {}
+    private: {}
+    profile picture: {}'''.format(target, userid, email, phone, private, profpc)) #writing the infos
+
+def useprofilepic(profilepicture, target):
+    a = input("Do you want to see {}'s profile pricture ? [y/n] ".format(target))
+    if a == "Y" or a == "y" or a =="Yes" or a == "YES" or a == "yes":
+        webbrowser.open_new(profilepicture)
+    b = input("Do you want to download {}'s profile picture ? [y/n] ".format(target))
+    if b == "Y" or b == "y" or b =="Yes" or b == "YES" or b == "yes":
+        r = requests.get(profilepicture)
+        pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb")
+        pp.write(r.content)
+        pp.close
+
+def filereading(file):
+    g = open(file)
+    lines = g.readlines()
+    for line in lines:
+        target = line.replace("\n", "")
+        userid = UserID(target) 
+        targetinfo = FakePhoneSession(sessionid, userid, target) 
+        email = mailextraction(targetinfo)
+        phone = phoneextraction(targetinfo)
+        private = privateaccount(targetinfo)
+        profpc = profilpic(targetinfo)
+        print('''{}'s ID is {}:
+            email: {}
+            phone: {}
+            private: {}'''.format(target, userid, email, phone, private))
+        c = input("Do you want to export the information ? [y/n] ") 
+        if c == "Y" or c == "y" or c =="Yes" or c == "YES" or c == "yes":
+            name = input("Name the output file: ")
+            wirtingfile(target, userid, email, phone, private, profpc, name) #functions that are used to export infos 
+            useprofilepic(profpc, target)
+        else:
+            useprofilepic(profpc, target)
+    g.close()
+
+if file:
+    filereading(file)
+else:
+    target = args.target
+    userid = UserID(target) #give a value to userid for the next function
+    targetinfo = FakePhoneSession(sessionid, userid, target) 
+    email = mailextraction(targetinfo)
+    phone = phoneextraction(targetinfo)
+    private = privateaccount(targetinfo)
+    profpc = profilpic(targetinfo)
+    print('''{}'s ID is {}:
+        email: {}
+        phone: {}
+        private: {}'''.format(target, userid, email, phone, private))
+    c = input("Do you want to export the information ? [y/n] ") 
+    if c == "Y" or c == "y" or c =="Yes" or c == "YES" or c == "yes":
+        name = input("Name the output file: ")
+        wirtingfile(target, userid, email, phone, private, profpc, name) #functions that are used to export infos 
+        useprofilepic(profpc, target)
+    else:
+        useprofilepic(profpc, target)

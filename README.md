@@ -11,7 +11,7 @@ You simply use arguments as `-s` for your sessionID (check it next) and `-t` for
 # :pushpin: exemple
 If you want to scrap informations about one account:
 ```bash
-python3 lil_insta_scraper/lil_insta_scraper.py -s 123456%abcd -t a_taget_name
+python3 lil_insta_scraper/instascraper.py -s 123456%abcd -t a_taget_name
 ```
 If you have a list of accounts, you can do a simple list like:
 ```
@@ -21,7 +21,7 @@ usernameN
 ```
 You can you an other option: 
 ```bash
-python3 lil_insta_scraper/lil_insta_scraper.py -s 123456%abcd -f your_file_name.txt
+python3 lil_insta_scraper/instascraper.py -s 123456%abcd -f your_file_name.txt
 ```
 # :red_circle: Important note
 When you download a profile picture, export infos, download pictures or all, they will be saved in your current directory! 

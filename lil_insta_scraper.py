@@ -3,6 +3,7 @@ import json
 import argparse
 import webbrowser
 import os
+from datetime import datetime
 
 parser = argparse.ArgumentParser() #simpler
 requiered = parser.add_argument_group('requiered arguments')
@@ -61,6 +62,7 @@ def UserID(target):
     print("Following: ", following)
     print("Followers: ", followers)
     print("Biography: {}".format(info["graphql"]["user"]["biography"]))
+    print("Full name: {}".format(info["graphql"]["user"]["full_name"]))
     return(id)
 
 def wirtingfile(target, userid, email, phone, private, profpc, name):
@@ -75,18 +77,18 @@ def wirtingfile(target, userid, email, phone, private, profpc, name):
 def useprofilepic(profilepicture, target):
     a = input("Do you want to see {}'s profile pricture ? [y/n] ".format(target))
     if a == "Y" or a == "y" or a =="Yes" or a == "YES" or a == "yes":
-        webbrowser.open_new(profilepicture)
+        webbrowser.open_new(profilepicture) #to let you see it 
     b = input("Do you want to download {}'s profile picture ? [y/n] ".format(target))
     if b == "Y" or b == "y" or b =="Yes" or b == "YES" or b == "yes":
-        r = requests.get(profilepicture)
-        pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb")
-        pp.write(r.content)
+        r = requests.get(profilepicture) #getting the pp
+        pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb") #opening it 
+        pp.write(r.content) #writign it 
         pp.close
 
 def filereading(file):
     g = open(file)
     lines = g.readlines()
-    for line in lines:
+    for line in lines: #we just do the same thing as below but for each users in the file 
         target = line.replace("\n", "")
         userid = UserID(target) 
         targetinfo = FakePhoneSession(sessionid, userid, target) 
@@ -103,9 +105,54 @@ def filereading(file):
             name = input("Name the output file: ")
             wirtingfile(target, userid, email, phone, private, profpc, name) #functions that are used to export infos 
             useprofilepic(profpc, target)
+            c = input("Do you want to download all the pictures ? [y/n] ")
+            if c == "Y" or c == "y" or c =="Yes" or c == "YES" or c == "yes":
+                downloadimages(target, userid) #just calling function 
         else:
             useprofilepic(profpc, target)
     g.close()
+
+def downloadimages(target, userid):
+    cookies = {
+        'ig_cb': '1',
+        'ds_user_id': args.sessionid.split("%")[0],
+        'sessionid': args.sessionid,
+        'rur': 'FTW',
+    }
+    #those are custom header and cookie to be on your account 
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0',
+        'Accept': '*/*',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'X-Requested-With': 'XMLHttpRequest',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Referer': 'https://www.instagram.com/',
+        'TE': 'Trailers',
+    }
+
+    url_pics = []
+    timestamps = []
+    after = False
+    while 1:
+        if after:
+            url = 'https://www.instagram.com/graphql/query/?query_id=17888483320059182&variables={"id":"'+userid+'","first":50,"after":"'+after+'"}'
+        else:
+            url = 'https://www.instagram.com/graphql/query/?query_id=17888483320059182&variables={"id":"'+userid+'","first":50}'
+        content = requests.get(url, cookies=cookies, headers=headers) #requests with custom header and cookie
+        posts_json = json.loads(content.content.decode())
+        for i in range(len(posts_json["data"]["user"]["edge_owner_to_timeline_media"]["edges"])): #for each post 
+            url_pics.append(posts_json["data"]["user"]["edge_owner_to_timeline_media"]["edges"][i]["node"]["display_url"]) #reading picture url
+            timestamps.append(posts_json["data"]["user"]["edge_owner_to_timeline_media"]["edges"][i]["node"]["taken_at_timestamp"])
+        if posts_json["data"]["user"]["edge_owner_to_timeline_media"]["page_info"]["has_next_page"]: #check if there is more
+            after = posts_json["data"]["user"]["edge_owner_to_timeline_media"]["page_info"]["end_cursor"] # "scorlling" the page
+        else:
+            if len(url_pics) != 0:
+                for n in range(len(url_pics)): #repeat for each picture
+                    posts = requests.get(url_pics[n], cookies=cookies, headers=headers) #requests with custom header and cookie 
+                    with open("{}/".format(target) + datetime.utcfromtimestamp(timestamps[n]).strftime('%Y-%m-%d_%H-%M-%S') + ".png", "wb") as f : #name the files as the upload date
+                        f.write(posts.content) #write content
+        break
 
 if file:
     filereading(file)
@@ -116,15 +163,18 @@ else:
     email = mailextraction(targetinfo)
     phone = phoneextraction(targetinfo)
     private = privateaccount(targetinfo)
-    profpc = profilpic(targetinfo)
+    profpc = profilpic(targetinfo) 
     print('''{}'s ID is {}:
         email: {}
         phone: {}
-        private: {}'''.format(target, userid, email, phone, private))
+        private: {}'''.format(target, userid, email, phone, private)) #simply printing infos 
     c = input("Do you want to export the information ? [y/n] ") 
     if c == "Y" or c == "y" or c =="Yes" or c == "YES" or c == "yes":
         name = input("Name the output file: ")
         wirtingfile(target, userid, email, phone, private, profpc, name) #functions that are used to export infos 
         useprofilepic(profpc, target)
+        c = input("Do you want to download all the pictures ? [y/n] ")
+        if c == "Y" or c == "y" or c =="Yes" or c == "YES" or c == "yes":
+            downloadimages(target, userid)
     else:
         useprofilepic(profpc, target)

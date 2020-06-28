@@ -1,5 +1,5 @@
 # :flags: lil_insta_scraper
-lil_insta_scraper is an instagram scraper in python. It allows you to grab some informations about an account (mail, phone, biography, followers count, following count, profile picture). You can see and download profile pictures in a quite high quality. The informations you scrapped can be exported as a folder and a text file. 
+lil_insta_scraper is an instagram scraper in python. It allows you to grab some informations about an account (mail, phone, biography, followers count, following count, profile picture). You can see and download profile pictures and pictures in a quite high quality. The informations you scrapped can be exported as a folder and a text file. 
 # :wrench: Installation
 ```bash
 git clone https://github.com/TheSaltMaker/lil_insta_scraper.git
@@ -24,12 +24,14 @@ You can you an other option:
 python3 lil_insta_scraper/lil_insta_scraper.py -s 123456%abcd -f your_file_name.txt
 ```
 # :red_circle: Important note
-When you download a profile picture, export infos or both, they will be saved in your current directory!
+When you download a profile picture, export infos, download pictures or all, they will be saved in your current directory! 
 # :page_with_curl: how to have your session ID 
 To have your sesssion ID you have to log in on instagram with your browser. You have to `Inspect element` and go in `storage`. Now you can see a category named `cookies` within instagram url. You go on it and you can see a table with the `sessionid`. 
 
 ![alt text](https://github.com/TheSaltMaker/lil_insta_scraper/blob/master/lil_insta_scraper_sessionid.png?raw=true)
 # :exclamation: Disclaimer
-I'm not responsible of what you do with this script !
+I'm not responsible of what you do with this script! I did it to train myself and joke with a friend, don't use it to harm someone. 
 # :speech_balloon: Contact me
-If you want to talk with me, you may find me on discord `SCP-343#2349` (I have may changed my name) or on Twitter `@MathsBreaking`.
+If you want to talk with me, you may find me on discord `SCP-343#2349` (I have may changed my name) or on Twitter `@MathsBreaking` aka `TheSaltMaker`.
+A special thanks to Loutre, he helped me with with the downloading posts part. 
+

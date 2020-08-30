@@ -81,9 +81,15 @@ def useprofilepic(profilepicture, target):
     b = input("Do you want to download {}'s profile picture ? [y/n] ".format(target))
     if b == "Y" or b == "y" or b =="Yes" or b == "YES" or b == "yes":
         r = requests.get(profilepicture) #getting the pp
-        pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb") #opening it 
-        pp.write(r.content) #writign it 
-        pp.close
+        if os.path.exists("{}".format(target)) == True:
+            pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb") #opening it 
+            pp.write(r.content) #writign it 
+            pp.close
+        else:
+            os.system("mkdir {}".format(target))
+            pp = open("{}/{}_profile_picture.jpg".format(target, target), "wb") #opening it 
+            pp.write(r.content) #writign it 
+            pp.close
 
 def filereading(file):
     g = open(file)
